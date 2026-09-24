@@ -1,74 +1,70 @@
-
 services:
   valkey:
     image: valkey/valkey:7-alpine
-    ports:
-      - "6379:6379"
+    ports: ["6379:6379"]
     command: valkey-server --appendonly yes
-    volumes:
-      - valkey_data:/data
-    networks:
-      - ai_net
+    volumes: [valkey_data:/data]
+    networks: [ai_net]
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       retries: 5
-  chromadb:
-    image: chromadb/chroma:latest
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./chroma_data:/chroma/chroma
-    networks:
-      - ai_net
 
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
-      - WEBHOOK_URL=http://localhost:5678/
-      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
-      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
-      - EXECUTIONS_DATA_SAVE_ON_PROGRESS=true
+  postgres:
+    image: pgvector/pgvector:pg16
+    env_file: .env
+    ports: ["5432:5432"]
     volumes:
-      - n8n_data:/home/node/.n8n
-    networks:
-      - ai_net
+      - pg_data:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/1-init.sql:ro
+    networks: [ai_net]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      retries: 10
 
   backend:
     build: ./backend
-    ports:
-      - "8080:8080"
+    ports: ["8080:8080"]
+    env_file: .env
+    environment: &backend_env
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - VALKEY_URL=redis://valkey:6379/0
+      - RATELIMIT_STORAGE_URI=redis://valkey:6379/1
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
-      - valkey
-    networks:
-      - ai_net
+      valkey: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    networks: [ai_net]
 
   worker:
     build: ./backend
     command: rq worker --url redis://valkey:6379/0
-    deploy:
-      replicas: 3 
+    env_file: .env
+    environment: *backend_env
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
-      - valkey
-      - n8n
-    networks:
-      - ai_net
+      valkey: {condition: service_healthy}
+      postgres: {condition: service_healthy}
+    networks: [ai_net]
+    deploy:
+      replicas: 3
 
   frontend:
     build: ./frontend
-    ports:
-      - "5173:5173" 
-    networks:
-      - ai_net
+    ports: ["5173:5173"]
+    environment:
+      - VITE_API_URL=http://localhost:8080
+    volumes:
+      - ./frontend:/app          
+      - /app/node_modules
+    networks: [ai_net]
 
 networks:
-  ai_net:
-    driver: bridge
-
+  ai_net: {driver: bridge}
 volumes:
   valkey_data:
-  n8n_data: 
+  pg_data:
+  uploads_data:

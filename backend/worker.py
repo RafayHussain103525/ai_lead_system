@@ -1,27 +1,19 @@
-import requests
+import logging
+from database import run_db_job
+from quota import QuotaExhausted
+from services.ingestion import ingest_document
+from services.rag_pipeline import run_chat
+
+logging.basicConfig(level=logging.INFO)
 
 def process_query(query: str, session_id: str):
-    print(f"[Worker] Picked up task for {session_id}. Forwarding to n8n...")
-    
-    # URL to the n8n webhook (internal docker network)
-    n8n_webhook_url = "http://n8n:5678/webhook/ai-chat"
-    
-    payload = {
-        "session_id": session_id,
-        "query": query
-    }
-    
     try:
-        # The worker pauses here while n8n executes the RAG and Gemini AI
-        response = requests.post(n8n_webhook_url, json=payload, timeout=120)
-        
-        if response.status_code == 200:
-            n8n_data = response.json()
-            return {"message": n8n_data.get("message", "No message returned by n8n.")}
-        else:
-            print(f"n8n Error: {response.text}")
-            return {"message": f"Error: n8n returned status {response.status_code}"}
-            
-    except Exception as e:
-        print(f"Error calling n8n: {e}")
-        return {"message": "Sorry, the AI engine is currently unreachable."}
+        return run_db_job(run_chat, query, session_id)
+    except QuotaExhausted:
+        return {"message": "The AI service is at its free-tier rate limit right now — please try again in a minute."}
+    except Exception:
+        logging.exception("process_query failed")
+        return {"message": "Sorry — the AI engine hit a snag. Please try again shortly."}
+
+def process_document(document_id: str):
+    return run_db_job(ingest_document, document_id)

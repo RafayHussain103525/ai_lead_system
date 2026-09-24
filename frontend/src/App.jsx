@@ -1,97 +1,90 @@
+import { Routes, Route } from 'react-router-dom';
 import ChatWidget from './components/ChatWidget';
+import LeadForm from './components/LeadForm';
+import AdminLogin from './components/admin/AdminLogin';
+import AdminDashboard from './components/admin/AdminDashboard';
 
-function App() {
+const SERVICES = [
+  { title: 'End-to-End Custom AI & ML', text: "We treat data as a high-fidelity asset. Implementation of robust ETL pipelines using SQL, Python, and specialized feature stores to replace manual data wrangling." },
+  { title: 'Generative AI & Agentic Systems', text: "Moving past basic 'chatbots' to build Agentic Workflows that perform autonomous reasoning and task execution via Advanced RAG architectures." },
+  { title: 'MLOps & Deployment', text: "A model is only as good as its deployment. We focus on 'Zero-Downtime' updates, Docker containerization, and full CI/CD for Machine Learning." },
+  { title: 'Full-Stack Engineering', text: "Modular React/Node.js or Flutter applications designed to act as the 'nervous system' for your AI 'brains', prioritizing clean code and type-safety." },
+];
+
+const PRICING = [
+  { name: 'Phase 1: Discovery & MVP', price: '$25,000 – $75,000' },
+  { name: 'Phase 2: Production Scaling', price: '$150,000+' },
+  { name: 'Phase 3: Managed MLOps', price: '$5,000/mo Retainer' },
+];
+
+function Landing() {
   return (
-    <div className="min-h-screen relative font-sans selection:bg-gold-500 selection:text-black">
-      {/* Background Liquid Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold-600/20 rounded-full blur-[120px] animate-blob"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold-500/10 rounded-full blur-[120px] animate-blob" style={{ animationDelay: '2s' }}></div>
+    <div className="min-h-screen bg-dark text-white relative overflow-x-hidden">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl animate-blob" />
+        <div className="absolute bottom-0 -right-32 w-[28rem] h-[28rem] bg-gold-600/10 rounded-full blur-3xl animate-blob" style={{ animationDelay: '3.5s' }} />
       </div>
-
-      {/* Navigation */}
-      <nav className="w-full p-6 flex justify-between items-center fixed top-0 z-40 bg-black/20 backdrop-blur-md border-b border-white/5">
-        <h1 className="text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">
-          NEXUS AI
-        </h1>
-        <div className="hidden md:flex gap-8 text-sm tracking-widest text-gray-300">
+      <nav className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-white/5 backdrop-blur-sm">
+        <span className="text-gold-500 text-2xl font-bold tracking-wider">NEXUS AI</span>
+        <div className="hidden md:flex items-center gap-8 text-sm text-gray-300">
           <a href="#vision" className="hover:text-gold-500 transition-colors">VISION</a>
           <a href="#services" className="hover:text-gold-500 transition-colors">SERVICES</a>
           <a href="#pricing" className="hover:text-gold-500 transition-colors">PRICING</a>
+          <a href="#contact" className="px-4 py-2 bg-gradient-to-r from-gold-600 to-gold-400 text-black rounded-full font-semibold hover:scale-105 transition-transform">BOOK CONSULTATION</a>
         </div>
-        <button className="px-6 py-2 bg-transparent border border-gold-500 text-gold-500 hover:bg-gold-500 hover:text-black rounded text-sm tracking-wider transition-all">
-          BOOK CONSULTATION
-        </button>
       </nav>
-
-      {/* Hero Section */}
-      <main className="pt-32 px-6 max-w-6xl mx-auto space-y-32 pb-32">
-        
-        <section className="min-h-[70vh] flex flex-col justify-center items-start">
-          <h2 className="text-5xl md:text-7xl font-light text-white mb-6 leading-tight">
-            Enterprise AI Architecture <br/>
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-yellow-200">
-              & Custom Software Engineering
-            </span>
-          </h2>
-          <p className="text-xl text-gray-400 max-w-2xl mb-10 leading-relaxed">
-            In an era where 'AI-enabled' is often a buzzword, we provide the architectural integrity and mathematical rigor required to move beyond the sandbox.
-          </p>
-        </section>
-
-        {/* Services Glass Cards */}
-        <section id="services" className="space-y-12">
-          <h3 className="text-3xl font-light text-white tracking-widest border-b border-gold-500/20 pb-4 inline-block">CORE SERVICES</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-gold-500/50 transition-colors group">
-              <h4 className="text-xl text-gold-400 font-semibold mb-4">End-to-End Custom AI & ML</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">We treat data as a high-fidelity asset. Implementation of robust ETL pipelines using SQL, Python, and specialized feature stores to replace manual data wrangling.</p>
+      <header id="vision" className="relative z-10 max-w-5xl mx-auto px-6 pt-24 pb-16 text-center">
+        <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+          Enterprise <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">AI Architecture</span> & Custom Software Engineering
+        </h1>
+        <p className="mt-6 text-gray-400 max-w-2xl mx-auto text-lg">
+          In an era where 'AI-enabled' is often a buzzword, we provide the architectural integrity and mathematical rigor required to move beyond the sandbox.
+        </p>
+        <a href="#contact" className="inline-block mt-8 px-8 py-3 bg-gradient-to-r from-gold-600 to-gold-400 text-black font-semibold rounded-full shadow-lg shadow-gold-500/30 hover:scale-105 transition-transform">
+          Talk to our AI
+        </a>
+      </header>
+      <section id="services" className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-center text-3xl font-bold mb-12"><span className="text-gold-500">CORE</span> SERVICES</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          {SERVICES.map((s) => (
+            <div key={s.title} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 hover:border-gold-500/30 transition-colors">
+              <h3 className="text-xl font-semibold text-gold-400">{s.title}</h3>
+              <p className="mt-3 text-sm text-gray-400 leading-relaxed">{s.text}</p>
             </div>
-
-            <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-gold-500/50 transition-colors">
-              <h4 className="text-xl text-gold-400 font-semibold mb-4">Generative AI & Agentic Systems</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">Moving past basic 'chatbots' to build Agentic Workflows that perform autonomous reasoning and task execution via Advanced RAG architectures.</p>
+          ))}
+        </div>
+      </section>
+      <section id="pricing" className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+        <h2 className="text-center text-3xl font-bold mb-12"><span className="text-gold-500">ENGAGEMENT</span> MODELS</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {PRICING.map((p, i) => (
+            <div key={p.name} className={`rounded-2xl border p-8 text-center ${i === 1 ? 'border-gold-500/40 bg-gold-500/5' : 'border-white/10 bg-white/5'}`}>
+              <h3 className="text-lg font-semibold">{p.name}</h3>
+              <p className="mt-4 text-2xl font-bold text-gold-400">{p.price}</p>
             </div>
-
-            <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-gold-500/50 transition-colors">
-              <h4 className="text-xl text-gold-400 font-semibold mb-4">MLOps & Deployment</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">A model is only as good as its deployment. We focus on 'Zero-Downtime' updates, Docker containerization, and full CI/CD for Machine Learning.</p>
-            </div>
-
-            <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-lg border border-white/10 hover:border-gold-500/50 transition-colors">
-              <h4 className="text-xl text-gold-400 font-semibold mb-4">Full-Stack Engineering</h4>
-              <p className="text-gray-400 text-sm leading-relaxed">Modular React/Node.js or Flutter applications designed to act as the 'nervous system' for your AI 'brains', prioritizing clean code and type-safety.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing */}
-        <section id="pricing" className="p-12 rounded-3xl bg-gradient-to-br from-gold-900/20 to-black border border-gold-500/20">
-          <h3 className="text-3xl font-light text-white tracking-widest mb-8">ENGAGEMENT MODELS</h3>
-          <ul className="space-y-6">
-            <li className="flex justify-between items-center border-b border-white/10 pb-4">
-              <span className="text-gray-300">Phase 1: Discovery & MVP</span>
-              <span className="text-gold-400 font-mono">$25,000 - $75,000</span>
-            </li>
-            <li className="flex justify-between items-center border-b border-white/10 pb-4">
-              <span className="text-gray-300">Phase 2: Production Scaling</span>
-              <span className="text-gold-400 font-mono">$150,000+</span>
-            </li>
-            <li className="flex justify-between items-center border-b border-white/10 pb-4">
-              <span className="text-gray-300">Phase 3: Managed MLOps</span>
-              <span className="text-gold-400 font-mono">$5,000/mo Retainer</span>
-            </li>
-          </ul>
-        </section>
-
-      </main>
-
-      {/* Render the custom Chat Widget */}
+          ))}
+        </div>
+      </section>
+      <section id="contact" className="relative z-10 max-w-3xl mx-auto px-6 py-16">
+        <h2 className="text-center text-3xl font-bold mb-4">Book a <span className="text-gold-500">Consultation</span></h2>
+        <p className="text-center text-gray-400 mb-10">Leave your details — our team (and our AI) will reach out.</p>
+        <LeadForm />
+      </section>
+      <footer className="relative z-10 border-t border-white/5 py-8 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} Nexus AI — Enterprise AI Architecture
+      </footer>
       <ChatWidget />
-      
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/admin" element={<AdminLogin />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+    </Routes>
+  );
+}
