@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Send, Sparkles, X, PhoneCall } from 'lucide-react';
 import { API_BASE } from '../lib/api';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-const THINKING_MESSAGES = ['AI is thinking...', 'Doing research...', 'Please wait...', 'Cycling through...','Pondring...'];
+const THINKING_MESSAGES = ['AI is thinking...', 'Doing research...', 'Please wait...', 'Cycling through...', 'Pondering...'];
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -92,6 +94,7 @@ export default function ChatWidget() {
               <X size={16} />
             </button>
           </div>
+          
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -100,10 +103,21 @@ export default function ChatWidget() {
                     ? 'bg-gradient-to-br from-gold-600 to-gold-400 text-black rounded-br-sm'
                     : 'bg-white/10 text-gray-200 rounded-bl-sm'
                 }`}>
-                  {msg.content}
+                  {msg.role === 'user' ? (
+                    // Plain text for user messages
+                    msg.content
+                  ) : (
+                    // Markdown rendering for AI messages
+                    <div className="prose prose-sm prose-invert max-w-none [&_p]:my-1.5 [&_ul]:my-1.5 [&_ol]:my-1.5 [&_li]:my-0.5 prose-headings:text-gold-400 prose-strong:text-white prose-a:text-gold-400">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
+            
             {isLoading && (
               <div className="flex items-center gap-2 text-xs text-gold-500/80">
                 <span className="w-2 h-2 rounded-full bg-gold-500 animate-pulse" />
@@ -112,6 +126,7 @@ export default function ChatWidget() {
             )}
             <div ref={messagesEndRef} />
           </div>
+
           <a href="#contact" onClick={() => setIsOpen(false)}
             className="mx-4 mb-2 flex items-center justify-center gap-2 text-xs text-gray-400 hover:text-gold-500 border border-white/10 rounded-full py-1.5 transition-colors">
             <PhoneCall size={12} /> Prefer a human? Book a call

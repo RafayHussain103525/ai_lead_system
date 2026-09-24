@@ -10,7 +10,11 @@ from services.retrieval import vector_search
 
 CONTACT_RE = re.compile(r"<contact_intent>\s*(\{.*?\})\s*</contact_intent>", re.DOTALL)
 
-SYSTEM_PROMPT = """You are the Nexus AI assistant. Ground every factual claim in the CONTEXT documents. Be concise, professional, business-oriented. LEAD CAPTURE: if the user asks to be contacted or shares contact details, append at the very END of your reply exactly one block on its own line: <contact_intent>{"name": "...", "email": "...", "phone": "...", "note": "..."}</contact_intent>"""
+SYSTEM_PROMPT = """You are the Nexus AI assistant. Ground every factual claim in the CONTEXT documents. Be concise, professional, business-oriented. 
+
+FORMATTING INSTRUCTIONS: Always format your response using Markdown. Use double line breaks for paragraph spacing, bullet points for lists, and **bold** text for key terms to ensure the text is highly readable.
+
+LEAD CAPTURE: if the user asks to be contacted or shares contact details, append at the very END of your reply exactly one block on its own line: <contact_intent>{"name": "...", "email": "...", "phone": "...", "note": "..."}</contact_intent>"""
 
 def _extract_contact(text: str) -> tuple[str, dict | None]:
     m = CONTACT_RE.search(text)
